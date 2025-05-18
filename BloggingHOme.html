@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faceless YouTube Channel Course</title>
+    <title>Blogging Masterclass Course</title>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Google Fonts -->
@@ -46,15 +45,14 @@
             box-shadow: var(--shadow);
         }
 
-        /*.container {*/
-        /*    width: 100%;*/
-        /*    max-width: 1000px;*/
-        /*    margin: 0 auto 100px auto;*/
-        /*    padding: px;*/
-        /*    background: white;*/
-        /*    border-radius: var(--border-radius);*/
-        /*    box-shadow: var(--shadow);*/
-        /*}*/
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto 100px auto;
+            padding: 20px;
+            background: white;
+            border-radius: var(--border-radius);
+        }
 
         .course-image {
             width: 100%;
@@ -244,19 +242,17 @@
     </style>
 </head>
 <body>
-    <!--<div class="header">-->
-    <!--    <h1>Faceless YouTube Academy</h1>-->
-    <!--</div>-->
+    
     
     <div class="container">
         <!-- Course Image Section -->
-        <img src="https://ikskills.com.ng/wp-content/uploads/2025/03/maxresdefault-1024x576.jpg" alt="Faceless YouTube Course" class="course-image">
+        <img src="https://ikskills.com.ng/wp-content/uploads/2025/03/Simple-Neon-Stand-Up-Comedy-Show-Youtube-Thumbnail-3.png" alt="Blogging Masterclass Course" class="course-image">
         
         <h1 class="course-title">Blogging Masterclass: Create, Grow & Monetize Your Blog</h1>
         <p class="course-subtitle">Ready to turn your ideas into a thriving blog that stands out? The Ultimate Blogging Masterclass gives you everything you need to create, grow, and monetize a successful blog from the ground up.</p> 
         
         <div class="creator-info">
-            <img src="https://ikskills.com.ng/wp-content/uploads/2025/03/maxresdefault-1024x576.jpg" alt="Lemuel Luka" class="creator-avatar">
+            <img src="https://ikskills.com.ng/wp-content/uploads/2025/03/Simple-Neon-Stand-Up-Comedy-Show-Youtube-Thumbnail-3.png" alt="Ikskills Africa" class="creator-avatar">
             <h3>Instructor: Ikskills Africa</h3>
             <p>Web developer and SEO Expert</p>
         </div>
@@ -271,7 +267,7 @@
             
             <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG1.html', 1)">
                 <i class="fab fa-youtube"></i>
-                <span class="btn-text">Lesson 1: Blogging Masterclass Course Outline: Everything You’ll Learn! 🚀</span>
+                <span class="btn-text">Lesson 1: Blogging Masterclass Course Outline: Everything You'll Learn! 🚀</span>
             </button>
             
             <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG2.html', 2)">
@@ -299,31 +295,22 @@
                 <span class="btn-text">Lesson 6: How to Write SEO-Friendly Blog Posts </span>
             </button>
             
-            <button class="btn youtube-btn" onclick="openLesson(''https://daviddevworld.github.io/Blogging/BG7.html', 7)">
+            <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG7.html', 7)">
                 <i class="fab fa-youtube"></i>
                 <span class="btn-text">Lesson 7: How To Get Free IMAGES & VIDEOS for Your Blog </span>
             </button>
-            
-            <!--<button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/JLBCUXjJZBOCSjkcZBcZCJZBXKuicZbFacelessYoutube/YT8.HTML', 8)">-->
-            <!--    <i class="fab fa-youtube"></i>-->
-            <!--    <span class="btn-text">Lesson 8: Building Your Audience Without Showing Your Face</span>-->
-            <!--</button>-->
-            
-            <!--<button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/JLBCUXjJZBOCSjkcZBcZCJZBXKuicZbFacelessYoutube/YT9.HTML', 9)">-->
-            <!--    <i class="fab fa-youtube"></i>-->
-            <!--    <span class="btn-text">Lesson 9: Advanced YouTube Growth Tactics</span>-->
-            <!--</button>-->
         </div>
         
         <div class="footer">
             <h3>Thank You For Joining! Visit: Ikskills.com.ng</h3>
+            
         </div>
     </div>
 
     <script>
         // Track progress and viewed lessons
         let viewedLessons = JSON.parse(localStorage.getItem('viewedLessons')) || [];
-        const totalLessons = 9;
+        const totalLessons = 7; // Updated to match the actual number of lessons
         
         // Update progress bar on page load
         window.onload = function() {
