@@ -19,6 +19,8 @@
             --light-color: #f9f9f9;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             --border-radius: 12px;
+            --locked-color: #cccccc;
+            --locked-bg: #f5f5f5;
         }
         
         * {
@@ -106,6 +108,7 @@
             transition: all 0.3s ease;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
             font-weight: 500;
+            position: relative;
         }
 
         .btn i {
@@ -121,7 +124,7 @@
             overflow: hidden;
         }
 
-        .youtube-btn:hover {
+        .youtube-btn:hover:not(.locked) {
             background: #e53935;
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -130,6 +133,49 @@
         .btn-text {
             flex-grow: 1;
             text-align: left;
+        }
+
+        /* Locked lesson styles */
+        .btn.locked {
+            background: var(--locked-bg);
+            color: var(--locked-color);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn.locked:hover {
+            transform: none;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn.locked .lock-icon {
+            color: #999;
+        }
+
+        /* Timer display */
+        .timer-display {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .btn.locked .timer-display {
+            background: rgba(0, 0, 0, 0.1);
+            color: #666;
+        }
+
+        /* Current lesson indicator */
+        .btn.current {
+            border: 2px solid #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
         }
 
         .footer {
@@ -189,6 +235,29 @@
             color: #888;
         }
 
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.warning {
+            background: #ff9800;
+        }
+
         @media (max-width: 768px) {
             .container {
                 width: 95%;
@@ -205,6 +274,12 @@
             
             .btn {
                 padding: 14px 16px;
+            }
+
+            .timer-display {
+                right: 15px;
+                font-size: 0.8rem;
+                min-width: 50px;
             }
         }
 
@@ -227,6 +302,13 @@
             .lesson-number {
                 display: none;
             }
+
+            .timer-display {
+                position: static;
+                transform: none;
+                margin-left: auto;
+                margin-top: 5px;
+            }
         }
         
         /* Animation for buttons */
@@ -236,8 +318,18 @@
             100% { transform: scale(1); }
         }
         
-        .btn:active {
+        .btn:active:not(.locked) {
             transform: scale(0.98);
+        }
+
+        @keyframes unlock {
+            0% { opacity: 0.6; transform: scale(0.95); }
+            50% { transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .btn.unlocking {
+            animation: unlock 0.5s ease-out;
         }
     </style>
 </head>
@@ -265,39 +357,46 @@
         <div class="lesson-section">
             <h2 class="section-title">Course Lessons</h2>
             
-            <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG1.html', 1)">
+            <button class="btn youtube-btn" id="lesson-1" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG1.html', 1)">
                 <i class="fab fa-youtube"></i>
                 <span class="btn-text">Lesson 1: Blogging Masterclass Course Outline: Everything You'll Learn! 🚀</span>
+                <div class="timer-display" id="timer-1">Ready</div>
             </button>
             
-            <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG2.html', 2)">
-                <i class="fab fa-youtube"></i>
-                <span class="btn-text">Lesson 2: Why You Should Start with Blogger </span>
+            <button class="btn youtube-btn locked" id="lesson-2" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG2.html', 2)">
+                <i class="fas fa-lock lock-icon"></i>
+                <span class="btn-text">Lesson 2: Why You Should Start with Blogger</span>
+                <div class="timer-display" id="timer-2">Locked</div>
             </button>
             
-            <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG3.html', 3)">
-                <i class="fab fa-youtube"></i>
+            <button class="btn youtube-btn locked" id="lesson-3" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG3.html', 3)">
+                <i class="fas fa-lock lock-icon"></i>
                 <span class="btn-text">Lesson 3: How to Create a Free Blog on Blogger in 2025 Using Your smartphone</span>
+                <div class="timer-display" id="timer-3">Locked</div>
             </button>
             
-            <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG4.html', 4)">
-                <i class="fab fa-youtube"></i>
-                <span class="btn-text">Lesson 4: How To Create Must Have PAGES in Your BLOG </span>
+            <button class="btn youtube-btn locked" id="lesson-4" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG4.html', 4)">
+                <i class="fas fa-lock lock-icon"></i>
+                <span class="btn-text">Lesson 4: How To Create Must Have PAGES in Your BLOG</span>
+                <div class="timer-display" id="timer-4">Locked</div>
             </button>
             
-            <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG5.html', 5)">
-                <i class="fab fa-youtube"></i>
+            <button class="btn youtube-btn locked" id="lesson-5" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG5.html', 5)">
+                <i class="fas fa-lock lock-icon"></i>
                 <span class="btn-text">Lesson 5: How to Customize Your Blogger Theme Like a Pro</span>
+                <div class="timer-display" id="timer-5">Locked</div>
             </button>
             
-            <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG6.html', 6)">
-                <i class="fab fa-youtube"></i>
-                <span class="btn-text">Lesson 6: How to Write SEO-Friendly Blog Posts </span>
+            <button class="btn youtube-btn locked" id="lesson-6" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG6.html', 6)">
+                <i class="fas fa-lock lock-icon"></i>
+                <span class="btn-text">Lesson 6: How to Write SEO-Friendly Blog Posts</span>
+                <div class="timer-display" id="timer-6">Locked</div>
             </button>
             
-            <button class="btn youtube-btn" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG7.html', 7)">
-                <i class="fab fa-youtube"></i>
-                <span class="btn-text">Lesson 7: How To Get Free IMAGES & VIDEOS for Your Blog </span>
+            <button class="btn youtube-btn locked" id="lesson-7" onclick="openLesson('https://daviddevworld.github.io/Blogging/BG7.html', 7)">
+                <i class="fas fa-lock lock-icon"></i>
+                <span class="btn-text">Lesson 7: How To Get Free IMAGES & VIDEOS for Your Blog</span>
+                <div class="timer-display" id="timer-7">Locked</div>
             </button>
         </div>
         
@@ -307,18 +406,58 @@
         </div>
     </div>
 
+    <!-- Notification container -->
+    <div id="notification" class="notification"></div>
+
     <script>
-        // Track progress and viewed lessons
+        // Configuration
+        const LESSON_TIME_REQUIREMENT = 90; // 1.5 minutes in seconds (between 1-2 minutes)
+        const totalLessons = 7;
+        
+        // Track progress and lesson data
         let viewedLessons = JSON.parse(localStorage.getItem('viewedLessons')) || [];
-        const totalLessons = 7; // Updated to match the actual number of lessons
+        let lessonStartTimes = JSON.parse(localStorage.getItem('lessonStartTimes')) || {};
+        let lessonCompletedTimes = JSON.parse(localStorage.getItem('lessonCompletedTimes')) || {};
+        let unlockedLessons = JSON.parse(localStorage.getItem('unlockedLessons')) || [1]; // Lesson 1 is always unlocked
+        
+        // Timer intervals for active lessons
+        let activeTimers = {};
         
         // Update progress bar on page load
         window.onload = function() {
+            initializeLessons();
             updateProgressBar();
             animateElements();
+            
+            // Check for any lessons that should be unlocked based on stored completion times
+            checkAndUnlockLessons();
         };
         
+        function initializeLessons() {
+            for (let i = 1; i <= totalLessons; i++) {
+                const lessonBtn = document.getElementById(`lesson-${i}`);
+                const timerDisplay = document.getElementById(`timer-${i}`);
+                
+                if (unlockedLessons.includes(i)) {
+                    unlockLesson(i);
+                } else {
+                    lockLesson(i);
+                }
+                
+                // Update timer display based on stored data
+                updateTimerDisplay(i);
+            }
+        }
+        
         function openLesson(url, lessonNumber) {
+            const lessonBtn = document.getElementById(`lesson-${lessonNumber}`);
+            
+            // Check if lesson is locked
+            if (lessonBtn.classList.contains('locked')) {
+                showNotification('This lesson is locked. Complete the previous lesson first!', 'warning');
+                return;
+            }
+            
             // Add lesson to viewed if not already viewed
             if (!viewedLessons.includes(lessonNumber)) {
                 viewedLessons.push(lessonNumber);
@@ -326,14 +465,180 @@
                 updateProgressBar();
             }
             
+            // Start timing this lesson
+            startLessonTimer(lessonNumber);
+            
+            // Mark as current lesson
+            markCurrentLesson(lessonNumber);
+            
             // Open the lesson
             window.open(url, '_blank');
+            
+            // Show notification
+            showNotification(`Lesson ${lessonNumber} started! Spend at least ${Math.floor(LESSON_TIME_REQUIREMENT/60)} minute(s) to unlock the next lesson.`);
+        }
+        
+        function startLessonTimer(lessonNumber) {
+            // Record start time
+            lessonStartTimes[lessonNumber] = Date.now();
+            localStorage.setItem('lessonStartTimes', JSON.stringify(lessonStartTimes));
+            
+            // Clear any existing timer for this lesson
+            if (activeTimers[lessonNumber]) {
+                clearInterval(activeTimers[lessonNumber]);
+            }
+            
+            // Start countdown timer
+            activeTimers[lessonNumber] = setInterval(() => {
+                updateLessonTimer(lessonNumber);
+            }, 1000);
+        }
+        
+        function updateLessonTimer(lessonNumber) {
+            const startTime = lessonStartTimes[lessonNumber];
+            if (!startTime) return;
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const remaining = Math.max(0, LESSON_TIME_REQUIREMENT - elapsed);
+            
+            const timerDisplay = document.getElementById(`timer-${lessonNumber}`);
+            
+            if (remaining > 0) {
+                const minutes = Math.floor(remaining / 60);
+                const seconds = remaining % 60;
+                timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                // Time requirement met
+                timerDisplay.textContent = 'Complete';
+                clearInterval(activeTimers[lessonNumber]);
+                delete activeTimers[lessonNumber];
+                
+                // Mark lesson as completed
+                lessonCompletedTimes[lessonNumber] = Date.now();
+                localStorage.setItem('lessonCompletedTimes', JSON.stringify(lessonCompletedTimes));
+                
+                // Unlock next lesson
+                unlockNextLesson(lessonNumber);
+            }
+        }
+        
+        function unlockNextLesson(currentLesson) {
+            const nextLesson = currentLesson + 1;
+            if (nextLesson <= totalLessons && !unlockedLessons.includes(nextLesson)) {
+                unlockedLessons.push(nextLesson);
+                localStorage.setItem('unlockedLessons', JSON.stringify(unlockedLessons));
+                
+                unlockLesson(nextLesson);
+                showNotification(`🎉 Lesson ${nextLesson} unlocked! Great job completing Lesson ${currentLesson}!`);
+            }
+        }
+        
+        function unlockLesson(lessonNumber) {
+            const lessonBtn = document.getElementById(`lesson-${lessonNumber}`);
+            const timerDisplay = document.getElementById(`timer-${lessonNumber}`);
+            
+            lessonBtn.classList.remove('locked');
+            lessonBtn.classList.add('unlocking');
+            
+            // Change icon back to YouTube
+            const icon = lessonBtn.querySelector('i');
+            icon.className = 'fab fa-youtube';
+            
+            // Update timer display
+            if (lessonCompletedTimes[lessonNumber]) {
+                timerDisplay.textContent = 'Complete';
+            } else if (lessonStartTimes[lessonNumber]) {
+                updateLessonTimer(lessonNumber);
+            } else {
+                timerDisplay.textContent = 'Ready';
+            }
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                lessonBtn.classList.remove('unlocking');
+            }, 500);
+        }
+        
+        function lockLesson(lessonNumber) {
+            const lessonBtn = document.getElementById(`lesson-${lessonNumber}`);
+            const timerDisplay = document.getElementById(`timer-${lessonNumber}`);
+            
+            lessonBtn.classList.add('locked');
+            
+            // Change icon to lock
+            const icon = lessonBtn.querySelector('i');
+            icon.className = 'fas fa-lock lock-icon';
+            
+            timerDisplay.textContent = 'Locked';
+        }
+        
+        function markCurrentLesson(lessonNumber) {
+            // Remove current class from all lessons
+            for (let i = 1; i <= totalLessons; i++) {
+                document.getElementById(`lesson-${i}`).classList.remove('current');
+            }
+            
+            // Add current class to active lesson
+            document.getElementById(`lesson-${lessonNumber}`).classList.add('current');
+        }
+        
+        function updateTimerDisplay(lessonNumber) {
+            const timerDisplay = document.getElementById(`timer-${lessonNumber}`);
+            
+            if (lessonCompletedTimes[lessonNumber]) {
+                timerDisplay.textContent = 'Complete';
+            } else if (lessonStartTimes[lessonNumber]) {
+                updateLessonTimer(lessonNumber);
+            } else if (unlockedLessons.includes(lessonNumber)) {
+                timerDisplay.textContent = 'Ready';
+            } else {
+                timerDisplay.textContent = 'Locked';
+            }
+        }
+        
+        function checkAndUnlockLessons() {
+            // Check if any lessons should be unlocked based on completion times
+            for (let lessonNumber in lessonCompletedTimes) {
+                const nextLesson = parseInt(lessonNumber) + 1;
+                if (nextLesson <= totalLessons && !unlockedLessons.includes(nextLesson)) {
+                    unlockedLessons.push(nextLesson);
+                    localStorage.setItem('unlockedLessons', JSON.stringify(unlockedLessons));
+                    unlockLesson(nextLesson);
+                }
+            }
+            
+            // Restart any active timers
+            for (let lessonNumber in lessonStartTimes) {
+                const lessonNum = parseInt(lessonNumber);
+                if (!lessonCompletedTimes[lessonNum]) {
+                    const elapsed = Math.floor((Date.now() - lessonStartTimes[lessonNum]) / 1000);
+                    if (elapsed < LESSON_TIME_REQUIREMENT) {
+                        startLessonTimer(lessonNum);
+                    } else {
+                        // Should be completed
+                        lessonCompletedTimes[lessonNum] = Date.now();
+                        localStorage.setItem('lessonCompletedTimes', JSON.stringify(lessonCompletedTimes));
+                        updateTimerDisplay(lessonNum);
+                    }
+                }
+            }
         }
         
         function updateProgressBar() {
             const progressPercent = (viewedLessons.length / totalLessons) * 100;
             document.getElementById('progressBar').style.width = progressPercent + '%';
             document.querySelector('.complete-text').textContent = Math.round(progressPercent) + '% Complete';
+        }
+        
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
         }
         
         function animateElements() {
@@ -343,10 +648,12 @@
             }, 300);
             
             // Add hover effect to buttons with animation
-            const buttons = document.querySelectorAll('.btn');
+            const buttons = document.querySelectorAll('.btn:not(.locked)');
             buttons.forEach(button => {
                 button.addEventListener('mouseenter', () => {
-                    button.style.animation = 'pulse 1s infinite';
+                    if (!button.classList.contains('locked')) {
+                        button.style.animation = 'pulse 1s infinite';
+                    }
                 });
                 
                 button.addEventListener('mouseleave', () => {
@@ -354,6 +661,41 @@
                 });
             });
         }
+        
+        // Reset function for testing (can be called from console)
+        function resetCourse() {
+            localStorage.removeItem('viewedLessons');
+            localStorage.removeItem('lessonStartTimes');
+            localStorage.removeItem('lessonCompletedTimes');
+            localStorage.removeItem('unlockedLessons');
+            
+            // Clear active timers
+            for (let timer in activeTimers) {
+                clearInterval(activeTimers[timer]);
+            }
+            activeTimers = {};
+            
+            location.reload();
+        }
+        
+        // Handle page visibility change to pause/resume timers
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Page is hidden, pause timers by storing current state
+                for (let lessonNumber in activeTimers) {
+                    const startTime = lessonStartTimes[lessonNumber];
+                    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                    
+                    // Store the elapsed time
+                    lessonStartTimes[lessonNumber] = Date.now() - (elapsed * 1000);
+                    localStorage.setItem('lessonStartTimes', JSON.stringify(lessonStartTimes));
+                }
+            } else {
+                // Page is visible again, resume timers
+                checkAndUnlockLessons();
+            }
+        });
     </script>
 </body>
 </html>
+
